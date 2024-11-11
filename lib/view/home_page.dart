@@ -27,6 +27,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    homeProvider.homePageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     print('checkkk build home');
     context.watch<HomeProvider>();
@@ -36,6 +42,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: PageView(
         controller: homeProvider.homePageController,
+        onPageChanged: homeProvider.onHomePageSelected,
         children: [
           selectedImage != null
               ? Column(
@@ -48,7 +55,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       bottomNavigationBar: NavigationBar(
-        //animationDuration: const Duration(seconds: 1),
         destinations: const [
           NavigationDestination(icon: Icon(CupertinoIcons.doc_plaintext), label: 'Documents'),
           NavigationDestination(icon: Icon(Icons.privacy_tip_outlined), label: 'Passwords'),
@@ -56,63 +62,63 @@ class _HomePageState extends State<HomePage> {
         selectedIndex: homeProvider.selectedIndex,
         onDestinationSelected: homeProvider.onHomePageSelected,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _onAddDocument,
-        child: const Icon(CupertinoIcons.plus),
-      ),
+      floatingActionButton: homeProvider.selectedIndex == 0
+          ? FloatingActionButton(
+              onPressed: _onAddDocument,
+              child: const Icon(CupertinoIcons.plus),
+            )
+          : null,
     );
   }
 
-  _onAddDocument() async {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          InkWell(
-            onTap: _onUploadFromGallery,
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20),
-                  child: Icon(
-                    Icons.add_photo_alternate,
-                    color: AppThemeData.primaryColor,
+  _onAddDocument() async => showModalBottomSheet(
+        context: context,
+        builder: (context) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            InkWell(
+              onTap: _onUploadFromGallery,
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20),
+                    child: Icon(
+                      Icons.add_photo_alternate,
+                      color: AppThemeData.primaryColor,
+                    ),
                   ),
-                ),
-                const Text(
-                  'Upload from Gallery',
-                  style: TextStyle(
-                    fontSize: 20,
+                  const Text(
+                    'Upload from Gallery',
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          InkWell(
-            onTap: _onScanWithCamera,
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20),
-                  child: Icon(
-                    Icons.camera_alt_rounded,
-                    color: AppThemeData.primaryColor,
+            InkWell(
+              onTap: _onScanWithCamera,
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20),
+                    child: Icon(
+                      Icons.camera_alt_rounded,
+                      color: AppThemeData.primaryColor,
+                    ),
                   ),
-                ),
-                const Text(
-                  'Scan with Camera',
-                  style: TextStyle(
-                    fontSize: 20,
+                  const Text(
+                    'Scan with Camera',
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
 
   _onUploadFromGallery() async {
     Navigator.of(context).pop();

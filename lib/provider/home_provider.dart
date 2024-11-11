@@ -7,7 +7,7 @@ class HomeProvider extends ChangeNotifier {
 
   factory HomeProvider() => _instance;
 
-  PageController homePageController = PageController();
+  PageController homePageController = PageController(initialPage: 0);
   int _selectedIndex = 0;
 
   int get selectedIndex => _selectedIndex;
