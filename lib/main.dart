@@ -1,10 +1,18 @@
 import 'package:doc_saver_app/common/app_theme_data.dart';
 import 'package:doc_saver_app/provider/home_provider.dart';
 import 'package:doc_saver_app/routes.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 

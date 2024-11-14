@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:doc_saver_app/common/app_theme_data.dart';
+import 'package:doc_saver_app/model/document.dart';
 import 'package:doc_saver_app/provider/home_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -44,13 +45,7 @@ class _HomePageState extends State<HomePage> {
         controller: homeProvider.homePageController,
         onPageChanged: homeProvider.onHomePageSelected,
         children: [
-          selectedImage != null
-              ? Column(
-                  children: [
-                    Image.file(selectedImage!),
-                  ],
-                )
-              : const Text('No image'),
+          selectedImage != null ? Image.file(selectedImage!) : const Text('no image'),
           const Text('page 2'),
         ],
       ),
@@ -130,23 +125,28 @@ class _HomePageState extends State<HomePage> {
 
     if (image != null) {
       // Step 2: Crop the selected image
-      final croppedFile = await ImageCropper().cropImage(sourcePath: image.path, uiSettings: [
-        AndroidUiSettings(
-          activeControlsWidgetColor: AppThemeData.primaryColor,
-          lockAspectRatio: false,
-          toolbarColor: AppThemeData.primaryColor,
-          statusBarColor: AppThemeData.primaryColor,
-          //toolbarWidgetColor: AppThemeData.primaryColor,
-        )
-      ]);
+      CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        uiSettings: [
+          AndroidUiSettings(
+            activeControlsWidgetColor: AppThemeData.primaryColor,
+            lockAspectRatio: false,
+            toolbarColor: AppThemeData.primaryColor,
+            statusBarColor: AppThemeData.primaryColor,
+            //toolbarWidgetColor: AppThemeData.primaryColor,
+          )
+        ],
+      );
 
       if (croppedFile != null) {
         // Step 3: Get a directory path to save the cropped image
         final directory = await getApplicationDocumentsDirectory();
         final String newPath = '${directory.path}/${DateTime.now().millisecondsSinceEpoch}_DocSaver_image.png';
 
-        // Step 4: Save the cropped image
-        final File savedImage = await File(croppedFile.path).copy(newPath);
+        // // Step 4: Save the cropped image
+        // selectedImage = await File(croppedFile.path).copy(newPath);
+
+        Document.create(title: '', filePath: newPath);
 
         print('Cropped image saved to $newPath');
       } else {
@@ -163,11 +163,11 @@ class _HomePageState extends State<HomePage> {
     final ImagePicker picker = ImagePicker();
 
     // Step 1: Pick image from gallery or camera
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery); // or ImageSource.camera for camera
+    final XFile? image = await picker.pickImage(source: ImageSource.camera); // or ImageSource.camera for camera
 
     if (image != null) {
       // Step 2: Crop the selected image
-      final croppedFile = await ImageCropper().cropImage(sourcePath: image.path, uiSettings: [
+      CroppedFile? croppedFile = await ImageCropper().cropImage(sourcePath: image.path, uiSettings: [
         AndroidUiSettings(
           activeControlsWidgetColor: AppThemeData.primaryColor,
           lockAspectRatio: false,
@@ -180,9 +180,6 @@ class _HomePageState extends State<HomePage> {
         // Step 3: Get a directory path to save the cropped image
         final directory = await getApplicationDocumentsDirectory();
         final String newPath = '${directory.path}/${DateTime.now().millisecondsSinceEpoch}_DocSaver_image.png';
-
-        // Step 4: Save the cropped image
-        final File savedImage = await File(croppedFile.path).copy(newPath);
 
         print('Cropped image saved to $newPath');
       } else {
